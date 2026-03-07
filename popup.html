@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      width: 240px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding: 16px;
+      background: #1a1a1a;
+      color: #e8e8e8;
+    }
+    h2 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #fff;
+    }
+    .speed-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .speed-btn {
+      padding: 8px 0;
+      border: 1px solid #444;
+      border-radius: 6px;
+      background: #2a2a2a;
+      color: #ccc;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .speed-btn:hover {
+      background: #383838;
+      border-color: #666;
+    }
+    .speed-btn.active {
+      background: #cc0000;
+      border-color: #cc0000;
+      color: #fff;
+      font-weight: 700;
+    }
+    .status {
+      font-size: 11px;
+      color: #888;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h2>Playback Speed</h2>
+  <div class="speed-grid">
+    <button class="speed-btn" data-speed="1">1x</button>
+    <button class="speed-btn" data-speed="1.25">1.25x</button>
+    <button class="speed-btn" data-speed="1.5">1.5x</button>
+    <button class="speed-btn" data-speed="1.75">1.75x</button>
+    <button class="speed-btn" data-speed="2">2x</button>
+    <button class="speed-btn" data-speed="2.5">2.5x</button>
+  </div>
+  <div class="status" id="status">Loading...</div>
+  <script src="popup.js"></script>
+</body>
+</html>
