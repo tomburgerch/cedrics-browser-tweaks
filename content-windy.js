@@ -68,6 +68,45 @@
     window.location.replace(newUrl);
   }
 
+  // --- Behavior 3: Auto-Enable 1h Forecast ---
+  function enable1hForecast() {
+    const TIMEOUT_MS = 15000;
+    let done = false;
+
+    function tryEnable() {
+      const checkboxes = document.querySelectorAll("div.checkbox.noselect");
+      for (const cb of checkboxes) {
+        if (cb.textContent.includes("1h forecast")) {
+          if (cb.classList.contains("checkbox--off")) {
+            cb.click();
+          }
+          done = true;
+          return true;
+        }
+      }
+      return false;
+    }
+
+    // Try immediately first
+    if (tryEnable()) return;
+
+    // Watch for the panel to appear
+    const observeRoot = document.querySelector(".bottom-area") || document.body;
+    const observer = new MutationObserver(() => {
+      if (done) return;
+      if (tryEnable()) {
+        observer.disconnect();
+      }
+    });
+
+    observer.observe(observeRoot, { childList: true, subtree: true });
+
+    // Safety timeout — disconnect after 15s regardless
+    setTimeout(() => {
+      if (!done) observer.disconnect();
+    }, TIMEOUT_MS);
+  }
+
   // --- Init ---
   chrome.storage.sync.get(
     [
@@ -80,8 +119,14 @@
       "windy_lastLng",
     ],
     (settings) => {
+      // Redirects return early (page reloads), so only one fires
       handleHomepageRedirect(settings);
       handleMeteogramRedirect(settings);
+
+      // 1h forecast applies on pages that don't redirect
+      if (settings.windy_auto1hForecast !== false) {
+        enable1hForecast();
+      }
     }
   );
 })();
