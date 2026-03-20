@@ -1,14 +1,22 @@
 {
   "manifest_version": 3,
-  "name": "YouTube Speed Saver",
-  "version": "1.0.0",
-  "description": "Remembers your preferred YouTube playback speed and applies it automatically.",
+  "name": "Cedric's Browser Tweaks",
+  "version": "2.0.0",
+  "description": "Personalized browser enhancements: YouTube speed memory, Windy.com aviation weather preferences.",
   "permissions": ["storage"],
-  "host_permissions": ["*://*.youtube.com/*"],
+  "host_permissions": [
+    "*://*.youtube.com/*",
+    "*://*.windy.com/*"
+  ],
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/*"],
-      "js": ["content.js"],
+      "js": ["content-youtube.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["*://*.windy.com/*"],
+      "js": ["content-windy.js"],
       "run_at": "document_idle"
     }
   ],
