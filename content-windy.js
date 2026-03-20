@@ -39,6 +39,35 @@
   const coordMatch = pathname.match(COORD_REGEX);
   const hasMeteogram = pathname.includes("/meteogram");
 
+  // --- SPA Navigation Tracking ---
+  function saveLocationFromUrl() {
+    const match = window.location.pathname.match(COORD_REGEX);
+    if (match) {
+      const lat = parseFloat(match[1]);
+      const lng = parseFloat(match[2]);
+      chrome.storage.sync.set({ windy_lastLat: lat, windy_lastLng: lng });
+    }
+  }
+
+  // Monkey-patch history methods to detect SPA navigation
+  const originalPushState = history.pushState;
+  const originalReplaceState = history.replaceState;
+
+  history.pushState = function (...args) {
+    originalPushState.apply(this, args);
+    saveLocationFromUrl();
+  };
+
+  history.replaceState = function (...args) {
+    originalReplaceState.apply(this, args);
+    saveLocationFromUrl();
+  };
+
+  window.addEventListener("popstate", saveLocationFromUrl);
+
+  // Save initial location
+  saveLocationFromUrl();
+
   // --- Behavior 1: Default Location Redirect ---
   function handleHomepageRedirect(settings) {
     if (!isBareHomepage) return;
