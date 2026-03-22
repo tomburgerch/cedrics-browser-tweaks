@@ -5,7 +5,7 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      width: 240px;
+      width: 260px;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       padding: 16px;
       background: #1a1a1a;
@@ -16,6 +16,23 @@
       font-weight: 600;
       margin-bottom: 12px;
       color: #fff;
+    }
+    .section {
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #333;
+    }
+    .section:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    .section-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #666;
+      margin-bottom: 8px;
     }
     .speed-grid {
       display: grid;
@@ -49,19 +66,94 @@
       color: #888;
       text-align: center;
     }
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 0;
+    }
+    .toggle-label {
+      font-size: 13px;
+      color: #ccc;
+    }
+    .toggle {
+      position: relative;
+      width: 36px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: #444;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .toggle-slider::before {
+      content: "";
+      position: absolute;
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.2s;
+    }
+    .toggle input:checked + .toggle-slider {
+      background: #cc0000;
+    }
+    .toggle input:checked + .toggle-slider::before {
+      transform: translateX(16px);
+    }
   </style>
 </head>
 <body>
-  <h2>Playback Speed</h2>
-  <div class="speed-grid">
-    <button class="speed-btn" data-speed="1">1x</button>
-    <button class="speed-btn" data-speed="1.25">1.25x</button>
-    <button class="speed-btn" data-speed="1.5">1.5x</button>
-    <button class="speed-btn" data-speed="1.75">1.75x</button>
-    <button class="speed-btn" data-speed="2">2x</button>
-    <button class="speed-btn" data-speed="2.5">2.5x</button>
+  <div class="section">
+    <div class="section-label">YouTube</div>
+    <h2>Playback Speed</h2>
+    <div class="speed-grid">
+      <button class="speed-btn" data-speed="1">1x</button>
+      <button class="speed-btn" data-speed="1.25">1.25x</button>
+      <button class="speed-btn" data-speed="1.5">1.5x</button>
+      <button class="speed-btn" data-speed="1.75">1.75x</button>
+      <button class="speed-btn" data-speed="2">2x</button>
+      <button class="speed-btn" data-speed="2.5">2.5x</button>
+    </div>
+    <div class="status" id="yt-status">Loading...</div>
   </div>
-  <div class="status" id="status">Loading...</div>
+
+  <div class="section">
+    <div class="section-label">Windy.com</div>
+    <div class="toggle-row">
+      <span class="toggle-label">Auto-redirect to last location</span>
+      <label class="toggle">
+        <input type="checkbox" id="windy-redirect" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div class="toggle-row">
+      <span class="toggle-label">Auto-meteogram view</span>
+      <label class="toggle">
+        <input type="checkbox" id="windy-meteogram" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div class="toggle-row">
+      <span class="toggle-label">Auto 1h forecast</span>
+      <label class="toggle">
+        <input type="checkbox" id="windy-1h" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+  </div>
+
   <script src="popup.js"></script>
 </body>
 </html>
