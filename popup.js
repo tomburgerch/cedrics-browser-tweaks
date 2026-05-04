@@ -1,25 +1,95 @@
 // Cedric's Browser Tweaks — Popup Script
 
 // --- Focus Mode Section ---
-// Keep this list in sync with BLOCKED_DOMAINS in background.js.
-const FOCUS_SITES = [
-  "instagram.com",
-  "facebook.com",
-  "onemileatatime.com",
-  "wired.com",
-  "20min.ch",
-  "blick.ch",
-  "digitec.ch",
-  "daydeal.ch",
-];
+// The blocked-domain list is stored in chrome.storage.sync under
+// `focusBlockedDomains`. The service worker (background.js) seeds defaults on
+// install and re-syncs declarativeNetRequest rules whenever the list changes.
 
 const focusToggle = document.getElementById("focus-mode");
 const focusList = document.getElementById("focus-site-list");
+const focusAddInput = document.getElementById("focus-add-input");
+const focusAddBtn = document.getElementById("focus-add-btn");
+const focusAddError = document.getElementById("focus-add-error");
 
-focusList.innerHTML = FOCUS_SITES.map((d) => `<li>${d}</li>`).join("");
+let blockedDomains = [];
 
-chrome.storage.sync.get("focusModeEnabled", (result) => {
+function normalizeDomain(input) {
+  return input
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//, "")
+    .replace(/^www\./, "")
+    .split("/")[0]
+    .split("?")[0];
+}
+
+function isValidDomain(d) {
+  return /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/.test(d);
+}
+
+function renderDomains() {
+  focusList.innerHTML = "";
+  if (blockedDomains.length === 0) {
+    const li = document.createElement("li");
+    li.textContent = "(no sites — add one below)";
+    li.style.color = "#666";
+    li.style.justifyContent = "center";
+    focusList.appendChild(li);
+    return;
+  }
+  for (const domain of blockedDomains) {
+    const li = document.createElement("li");
+    const span = document.createElement("span");
+    span.className = "domain";
+    span.textContent = domain;
+    const btn = document.createElement("button");
+    btn.className = "remove-btn";
+    btn.textContent = "×";
+    btn.title = `Remove ${domain}`;
+    btn.addEventListener("click", () => removeDomain(domain));
+    li.append(span, btn);
+    focusList.appendChild(li);
+  }
+}
+
+function saveDomains() {
+  chrome.storage.sync.set({ focusBlockedDomains: blockedDomains });
+}
+
+function removeDomain(domain) {
+  blockedDomains = blockedDomains.filter((d) => d !== domain);
+  renderDomains();
+  saveDomains();
+}
+
+function addDomain() {
+  focusAddError.textContent = "";
+  const raw = focusAddInput.value;
+  if (!raw.trim()) return;
+  const normalized = normalizeDomain(raw);
+  if (!isValidDomain(normalized)) {
+    focusAddError.textContent = "Not a valid domain.";
+    return;
+  }
+  if (blockedDomains.includes(normalized)) {
+    focusAddError.textContent = "Already in the list.";
+    return;
+  }
+  blockedDomains = [...blockedDomains, normalized];
+  focusAddInput.value = "";
+  renderDomains();
+  saveDomains();
+}
+
+focusAddBtn.addEventListener("click", addDomain);
+focusAddInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") addDomain();
+});
+
+chrome.storage.sync.get(["focusModeEnabled", "focusBlockedDomains"], (result) => {
   focusToggle.checked = result.focusModeEnabled === true;
+  blockedDomains = Array.isArray(result.focusBlockedDomains) ? result.focusBlockedDomains : [];
+  renderDomains();
 });
 
 focusToggle.addEventListener("change", () => {
