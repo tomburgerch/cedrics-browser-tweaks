@@ -1,5 +1,31 @@
 // Cedric's Browser Tweaks — Popup Script
 
+// --- Focus Mode Section ---
+// Keep this list in sync with BLOCKED_DOMAINS in background.js.
+const FOCUS_SITES = [
+  "instagram.com",
+  "facebook.com",
+  "onemeilatatime.com",
+  "wired.com",
+  "20min.ch",
+  "blick.ch",
+  "digitec.ch",
+  "daydeal.ch",
+];
+
+const focusToggle = document.getElementById("focus-mode");
+const focusList = document.getElementById("focus-site-list");
+
+focusList.innerHTML = FOCUS_SITES.map((d) => `<li>${d}</li>`).join("");
+
+chrome.storage.sync.get("focusModeEnabled", (result) => {
+  focusToggle.checked = result.focusModeEnabled === true;
+});
+
+focusToggle.addEventListener("change", () => {
+  chrome.storage.sync.set({ focusModeEnabled: focusToggle.checked });
+});
+
 // --- YouTube Section ---
 const DEFAULT_SPEED = 2.0;
 const buttons = document.querySelectorAll(".speed-btn");
