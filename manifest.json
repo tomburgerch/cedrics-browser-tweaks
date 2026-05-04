@@ -1,13 +1,16 @@
 {
   "manifest_version": 3,
   "name": "Cedric's Browser Tweaks",
-  "version": "2.0.0",
-  "description": "Personalized browser enhancements: YouTube speed memory, Windy.com aviation weather preferences.",
-  "permissions": ["storage"],
+  "version": "2.1.0",
+  "description": "Personalized browser enhancements: YouTube speed memory, Windy.com aviation weather preferences, Focus Mode site blocker.",
+  "permissions": ["storage", "declarativeNetRequest"],
   "host_permissions": [
     "*://*.youtube.com/*",
     "*://*.windy.com/*"
   ],
+  "background": {
+    "service_worker": "background.js"
+  },
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/*"],

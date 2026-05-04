@@ -4,6 +4,12 @@ A Chrome extension with personalized enhancements for frequently used websites.
 
 ## Features
 
+### Focus Mode — Block Distracting Sites
+- Toggle in the popup to block a curated list of time-sink sites (Instagram, Facebook, news sites, deal sites, etc.)
+- Uses Chrome's `declarativeNetRequest` API for clean network-level blocking — blocked sites show `ERR_BLOCKED_BY_CLIENT`
+- Master on/off only for now; per-site toggles and time-of-day rules can be added later
+- The blocked-domain list lives in `background.js` (`BLOCKED_DOMAINS`) and `popup.js` (`FOCUS_SITES`) — keep them in sync
+
 ### YouTube — Speed Saver
 - Automatically sets your preferred playback speed on every YouTube video
 - Persists across page navigations, new tabs, and browser restarts

@@ -112,9 +112,40 @@
     .toggle input:checked + .toggle-slider::before {
       transform: translateX(16px);
     }
+    .blocked-sites {
+      margin-top: 10px;
+      font-size: 11px;
+      color: #777;
+      line-height: 1.6;
+    }
+    .blocked-sites .hint {
+      color: #666;
+      margin-bottom: 4px;
+    }
+    .blocked-sites ul {
+      list-style: none;
+      padding: 0;
+      columns: 2;
+      column-gap: 12px;
+    }
   </style>
 </head>
 <body>
+  <div class="section">
+    <div class="section-label">Focus Mode</div>
+    <div class="toggle-row">
+      <span class="toggle-label">Block distracting sites</span>
+      <label class="toggle">
+        <input type="checkbox" id="focus-mode">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div class="blocked-sites">
+      <div class="hint">When on, the following are blocked:</div>
+      <ul id="focus-site-list"></ul>
+    </div>
+  </div>
+
   <div class="section">
     <div class="section-label">YouTube</div>
     <h2>Playback Speed</h2>
