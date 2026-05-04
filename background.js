@@ -7,7 +7,7 @@
 const BLOCKED_DOMAINS = [
   "instagram.com",
   "facebook.com",
-  "onemeilatatime.com",
+  "onemileatatime.com",
   "wired.com",
   "20min.ch",
   "blick.ch",

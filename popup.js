@@ -5,7 +5,7 @@
 const FOCUS_SITES = [
   "instagram.com",
   "facebook.com",
-  "onemeilatatime.com",
+  "onemileatatime.com",
   "wired.com",
   "20min.ch",
   "blick.ch",
