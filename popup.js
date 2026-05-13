@@ -4,14 +4,22 @@
 // The blocked-domain list is stored in chrome.storage.sync under
 // `focusBlockedDomains`. The service worker (background.js) seeds defaults on
 // install and re-syncs declarativeNetRequest rules whenever the list changes.
+// Unlocking is gated by a 5-minute cooldown (`focusUnlockAt`) that the
+// service worker enforces via a chrome.alarms timer.
+
+const UNLOCK_COOLDOWN_MS = 5 * 60 * 1000;
 
 const focusToggle = document.getElementById("focus-mode");
 const focusList = document.getElementById("focus-site-list");
 const focusAddInput = document.getElementById("focus-add-input");
 const focusAddBtn = document.getElementById("focus-add-btn");
 const focusAddError = document.getElementById("focus-add-error");
+const cooldownPanel = document.getElementById("focus-cooldown");
+const countdownEl = document.getElementById("focus-countdown");
+const cancelBtn = document.getElementById("focus-cancel");
 
 let blockedDomains = [];
+let countdownTimer = null;
 
 function normalizeDomain(input) {
   return input
@@ -86,14 +94,79 @@ focusAddInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter") addDomain();
 });
 
-chrome.storage.sync.get(["focusModeEnabled", "focusBlockedDomains"], (result) => {
-  focusToggle.checked = result.focusModeEnabled === true;
-  blockedDomains = Array.isArray(result.focusBlockedDomains) ? result.focusBlockedDomains : [];
-  renderDomains();
-});
+function formatCountdown(ms) {
+  const total = Math.max(0, Math.ceil(ms / 1000));
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
+function renderFocusState({ focusModeEnabled, focusUnlockAt }) {
+  const enabled = focusModeEnabled === true;
+  const cooling = enabled && typeof focusUnlockAt === "number" && focusUnlockAt > Date.now();
+
+  // During cooldown sites are still blocked, so the toggle stays ON.
+  // The cooldown panel below exposes Cancel as the only way to act on it.
+  focusToggle.checked = enabled;
+  focusToggle.disabled = cooling;
+  cooldownPanel.classList.toggle("visible", cooling);
+
+  if (countdownTimer) {
+    clearInterval(countdownTimer);
+    countdownTimer = null;
+  }
+
+  if (cooling) {
+    const tick = () => {
+      const remaining = focusUnlockAt - Date.now();
+      if (remaining <= 0) {
+        clearInterval(countdownTimer);
+        countdownTimer = null;
+        return;
+      }
+      countdownEl.textContent = formatCountdown(remaining);
+    };
+    tick();
+    countdownTimer = setInterval(tick, 1000);
+  }
+}
+
+chrome.storage.sync.get(
+  ["focusModeEnabled", "focusBlockedDomains", "focusUnlockAt"],
+  (result) => {
+    blockedDomains = Array.isArray(result.focusBlockedDomains) ? result.focusBlockedDomains : [];
+    renderDomains();
+    renderFocusState(result);
+  }
+);
 
 focusToggle.addEventListener("change", () => {
-  chrome.storage.sync.set({ focusModeEnabled: focusToggle.checked });
+  if (focusToggle.checked) {
+    // Locking back on: instant, and cancels any pending unlock.
+    chrome.storage.sync.set({ focusModeEnabled: true, focusUnlockAt: null });
+  } else {
+    // Starting unlock: keep blocked, schedule cooldown.
+    const unlockAt = Date.now() + UNLOCK_COOLDOWN_MS;
+    // Revert the visual toggle — sites stay blocked until cooldown elapses.
+    focusToggle.checked = true;
+    chrome.storage.sync.set({ focusModeEnabled: true, focusUnlockAt: unlockAt });
+  }
+});
+
+cancelBtn.addEventListener("click", () => {
+  chrome.storage.sync.set({ focusModeEnabled: true, focusUnlockAt: null });
+});
+
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area !== "sync") return;
+  if ("focusModeEnabled" in changes || "focusUnlockAt" in changes) {
+    chrome.storage.sync.get(["focusModeEnabled", "focusUnlockAt"], renderFocusState);
+  }
+  if ("focusBlockedDomains" in changes) {
+    const next = changes.focusBlockedDomains.newValue;
+    blockedDomains = Array.isArray(next) ? next : [];
+    renderDomains();
+  }
 });
 
 // --- YouTube Section ---
