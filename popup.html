@@ -195,6 +195,44 @@
       margin-top: 4px;
       min-height: 12px;
     }
+    .cooldown {
+      margin-top: 10px;
+      padding: 10px;
+      background: #2a1f1f;
+      border: 1px solid #663030;
+      border-radius: 6px;
+      display: none;
+    }
+    .cooldown.visible {
+      display: block;
+    }
+    .cooldown-text {
+      font-size: 12px;
+      color: #e8b8b8;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+    .cooldown-countdown {
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+      color: #fff;
+    }
+    .cooldown-cancel {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #cc0000;
+      border-radius: 6px;
+      background: transparent;
+      color: #ff6666;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .cooldown-cancel:hover {
+      background: #cc0000;
+      color: #fff;
+    }
   </style>
 </head>
 <body>
@@ -215,6 +253,12 @@
         <button id="focus-add-btn">Add</button>
       </div>
       <div class="add-error" id="focus-add-error"></div>
+    </div>
+    <div class="cooldown" id="focus-cooldown">
+      <div class="cooldown-text">
+        Unlocking in <span class="cooldown-countdown" id="focus-countdown">5:00</span>. Sites stay blocked until then.
+      </div>
+      <button class="cooldown-cancel" id="focus-cancel">Cancel unlock — keep blocking</button>
     </div>
   </div>
 
