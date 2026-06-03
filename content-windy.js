@@ -2,9 +2,10 @@
 // Auto-applies preferred settings: default location, meteogram view, 1h forecast.
 
 (function () {
+  // Fallback location when nothing is saved yet: King Shaka / Durban (FALE).
   const DEFAULTS = {
-    lat: -33.759,
-    lng: 18.548,
+    lat: -29.602,
+    lng: 31.130,
     zoom: 10,
   };
 
