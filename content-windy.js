@@ -40,32 +40,43 @@
   const hasMeteogram = pathname.includes("/meteogram");
 
   // --- SPA Navigation Tracking ---
-  function saveLocationFromUrl() {
-    const match = window.location.pathname.match(COORD_REGEX);
-    if (match) {
-      const lat = parseFloat(match[1]);
-      const lng = parseFloat(match[2]);
-      chrome.storage.sync.set({ windy_lastLat: lat, windy_lastLng: lng });
-    }
+  // IMPORTANT: this content script runs in the ISOLATED world, so reassigning
+  // history.pushState/replaceState here does NOT intercept Windy's own SPA
+  // navigations — the page calls its main-world history binding, which never
+  // sees our override. (That was the old bug: "last location" only ever updated
+  // on a full page load, so it always reverted to the default/Morningstar.)
+  // Instead we POLL the current URL and persist coords whenever they change.
+  //
+  // Windy encodes the live map viewport in the query string (`?lat,lng,zoom`)
+  // and a picked detail point in the path (`/lat/lng[/meteogram]`). We PREFER
+  // the query — it updates on every pan/search — and fall back to the path.
+  const QUERY_COORD_REGEX = /[?&](-?\d+\.\d+),(-?\d+\.\d+)/;
+
+  function readCoordsFromUrl() {
+    const q = window.location.search.match(QUERY_COORD_REGEX);
+    if (q) return { lat: parseFloat(q[1]), lng: parseFloat(q[2]) };
+    const p = window.location.pathname.match(COORD_REGEX);
+    if (p) return { lat: parseFloat(p[1]), lng: parseFloat(p[2]) };
+    return null;
   }
 
-  // Monkey-patch history methods to detect SPA navigation
-  const originalPushState = history.pushState;
-  const originalReplaceState = history.replaceState;
+  let lastSavedKey = "";
+  function saveLocationFromUrl() {
+    const c = readCoordsFromUrl();
+    if (!c || Number.isNaN(c.lat) || Number.isNaN(c.lng)) return;
+    // Round to ~5 dp (~1 m) so micro-pans don't thrash chrome.storage.sync,
+    // which is rate-limited (120 writes/min, 1800/hr).
+    const key = `${c.lat.toFixed(5)},${c.lng.toFixed(5)}`;
+    if (key === lastSavedKey) return;
+    lastSavedKey = key;
+    chrome.storage.sync.set({ windy_lastLat: c.lat, windy_lastLng: c.lng });
+  }
 
-  history.pushState = function (...args) {
-    originalPushState.apply(this, args);
-    saveLocationFromUrl();
-  };
-
-  history.replaceState = function (...args) {
-    originalReplaceState.apply(this, args);
-    saveLocationFromUrl();
-  };
-
+  // Back/forward still emit popstate in the isolated world.
   window.addEventListener("popstate", saveLocationFromUrl);
-
-  // Save initial location
+  // Poll for the SPA navigations the isolated world can't observe directly.
+  setInterval(saveLocationFromUrl, 2500);
+  // Save the initial location.
   saveLocationFromUrl();
 
   // --- Behavior 1: Default Location Redirect ---
