@@ -18,7 +18,7 @@ A Chrome extension (Manifest V3) with personalized enhancements for frequently u
 - Speeds: 1x, 1.25x, 1.5x, 1.75x, 2x, 2.5x (default: 2x).
 
 ### Windy.com — Aviation Weather Preferences
-- Auto-redirects to your last viewed location (default: Morningstar Airfield, `-33.759 / 18.548`).
+- Auto-redirects to your last viewed location (default: King Shaka / Durban FALE, `-29.602 / 31.130`).
 - Auto-selects the Meteogram view for detailed aviation weather.
 - Auto-enables the 1h forecast for hourly resolution.
 - Remembers your location as you navigate (SPA-aware, with a redirect-loop guard).
