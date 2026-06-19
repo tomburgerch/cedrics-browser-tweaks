@@ -1,11 +1,20 @@
 // Cedric's Browser Tweaks — Popup Script
 
+import { getEffectiveDomains } from "./focus-defaults.js";
+
 // --- Focus Mode Section ---
 // The blocked-domain list is stored in chrome.storage.sync under
 // `focusBlockedDomains`. The service worker (background.js) seeds defaults on
 // install and re-syncs declarativeNetRequest rules whenever the list changes.
 // Unlocking is gated by a 5-minute cooldown (`focusUnlockAt`) that the
 // service worker enforces via a chrome.alarms timer.
+//
+// IMPORTANT: when `focusBlockedDomains` is not yet a usable array (e.g. a
+// freshly synced profile where onInstalled's seed has not run), we fall back
+// to the SAME defaults the blocker uses (via getEffectiveDomains) instead of
+// an empty list. Otherwise the popup would show "(no sites)" while the blocker
+// enforces the defaults, and the first "add" would persist a 1-element array
+// that clobbers those enforced defaults.
 
 const UNLOCK_COOLDOWN_MS = 5 * 60 * 1000;
 
@@ -131,14 +140,17 @@ function renderFocusState({ focusModeEnabled, focusUnlockAt }) {
   }
 }
 
-chrome.storage.sync.get(
-  ["focusModeEnabled", "focusBlockedDomains", "focusUnlockAt"],
-  (result) => {
-    blockedDomains = Array.isArray(result.focusBlockedDomains) ? result.focusBlockedDomains : [];
-    renderDomains();
-    renderFocusState(result);
-  }
-);
+async function loadFocusState() {
+  // Use the same effective-list resolution as the blocker so the UI never
+  // disagrees with what is actually enforced (falls back to defaults when the
+  // stored value is not yet a usable array).
+  blockedDomains = await getEffectiveDomains();
+  renderDomains();
+  const result = await chrome.storage.sync.get(["focusModeEnabled", "focusUnlockAt"]);
+  renderFocusState(result);
+}
+
+loadFocusState();
 
 focusToggle.addEventListener("change", () => {
   if (focusToggle.checked) {
@@ -163,9 +175,13 @@ chrome.storage.onChanged.addListener((changes, area) => {
     chrome.storage.sync.get(["focusModeEnabled", "focusUnlockAt"], renderFocusState);
   }
   if ("focusBlockedDomains" in changes) {
-    const next = changes.focusBlockedDomains.newValue;
-    blockedDomains = Array.isArray(next) ? next : [];
-    renderDomains();
+    // Re-resolve through the shared effective-list logic: a real edit carries
+    // the persisted array; a cleared/absent value falls back to the defaults
+    // the blocker enforces (never to an empty list).
+    getEffectiveDomains().then((domains) => {
+      blockedDomains = domains;
+      renderDomains();
+    });
   }
 });
 

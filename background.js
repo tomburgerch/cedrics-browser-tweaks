@@ -7,25 +7,16 @@
 // the user toggles off, `focusUnlockAt` is set to a future timestamp and an
 // alarm flips `focusModeEnabled` to false on fire.
 
-const DEFAULT_BLOCKED_DOMAINS = [
-  "instagram.com",
-  "facebook.com",
-  "onemileatatime.com",
-  "wired.com",
-  "20min.ch",
-  "blick.ch",
-  "digitec.ch",
-  "daydeal.ch",
-];
+import {
+  DEFAULT_BLOCKED_DOMAINS,
+  sanitizeDomains,
+  getEffectiveDomains,
+} from "./focus-defaults.js";
 
 const UNLOCK_ALARM = "focus-mode-unlock";
 
 async function getDomains() {
-  const { focusBlockedDomains } = await chrome.storage.sync.get("focusBlockedDomains");
-  if (Array.isArray(focusBlockedDomains)) {
-    return focusBlockedDomains.filter((d) => typeof d === "string" && d.length > 0);
-  }
-  return DEFAULT_BLOCKED_DOMAINS;
+  return getEffectiveDomains();
 }
 
 async function syncBlockRules() {
@@ -56,7 +47,7 @@ async function syncBlockRules() {
 
 async function seedDefaultsIfMissing() {
   const { focusBlockedDomains } = await chrome.storage.sync.get("focusBlockedDomains");
-  if (!Array.isArray(focusBlockedDomains)) {
+  if (sanitizeDomains(focusBlockedDomains) === null) {
     await chrome.storage.sync.set({ focusBlockedDomains: DEFAULT_BLOCKED_DOMAINS });
   }
 }
