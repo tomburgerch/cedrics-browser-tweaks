@@ -238,3 +238,25 @@ for (const [elementId, storageKey] of Object.entries(windyToggles)) {
     chrome.storage.sync.set({ [storageKey]: el.checked });
   });
 }
+
+// --- Google Flights Section ---
+// content-flights.js writes `flights_currency` too, whenever a currency is
+// picked in Flights' own footer picker; the last choice wins.
+const flightsEnabled = document.getElementById("flights-enabled");
+const flightsCurrency = document.getElementById("flights-currency");
+
+chrome.storage.sync.get(["flights_enabled", "flights_currency"], (result) => {
+  flightsEnabled.checked = result.flights_enabled !== false;
+  const curr = result.flights_currency || "USD";
+  if (![...flightsCurrency.options].some((o) => o.value === curr)) {
+    flightsCurrency.add(new Option(curr, curr));
+  }
+  flightsCurrency.value = curr;
+});
+
+flightsEnabled.addEventListener("change", () => {
+  chrome.storage.sync.set({ flights_enabled: flightsEnabled.checked });
+});
+flightsCurrency.addEventListener("change", () => {
+  chrome.storage.sync.set({ flights_currency: flightsCurrency.value });
+});

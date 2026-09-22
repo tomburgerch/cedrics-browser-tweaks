@@ -1,6 +1,6 @@
 # Cedric's Browser Tweaks
 
-A Chrome extension (Manifest V3) with personalized enhancements for frequently used websites: a Focus Mode site blocker, YouTube playback-speed memory, and Windy.com aviation weather preferences.
+A Chrome extension (Manifest V3) with personalized enhancements for frequently used websites: a Focus Mode site blocker, YouTube playback-speed memory, Windy.com aviation weather preferences, and a fixed Google Flights currency.
 
 ## Features
 
@@ -24,6 +24,12 @@ A Chrome extension (Manifest V3) with personalized enhancements for frequently u
 - Remembers your location as you navigate (SPA-aware, with a redirect-loop guard).
 - All features can be toggled on/off from the popup.
 
+### Google Flights: Fixed Currency
+- Shows prices in your currency (default **USD**) instead of the local one Google guesses from your IP (ISK in Iceland, CHF in Switzerland).
+- Remembers the last currency you picked, either in Flights' own footer picker or in the extension popup (`flights_currency`, synced).
+- How: Google Flights reads the `curr=` query param but never persists it, so `content-flights.js` adds your currency to every Flights URL. A link from outside Flights that carries another currency is rewritten to yours; a currency you choose inside Flights becomes the new default.
+- Toggle it off in the popup (`flights_enabled`).
+
 ## Tech Stack
 
 - Plain JavaScript Chrome extension, **Manifest V3** — no build step, no dependencies.
@@ -36,7 +42,8 @@ A Chrome extension (Manifest V3) with personalized enhancements for frequently u
 - `background.js` — Focus Mode service worker: manages dynamic `declarativeNetRequest` block rules and the unlock-cooldown alarm.
 - `content-youtube.js` — applies preferred playback speed on YouTube.
 - `content-windy.js` — applies Windy.com location / meteogram / 1h-forecast preferences.
-- `popup.html` / `popup.js` — toolbar popup UI for configuring all three features.
+- `content-flights.js` — keeps Google Flights on your preferred currency.
+- `popup.html` / `popup.js` — toolbar popup UI for configuring all four features.
 - `icons/` — extension icons (16/48/128, plus source `icon.svg`).
 - `docs/superpowers/` — design specs (`specs/`) and implementation plans (`plans/`), e.g. the Windy preferences design.
 
@@ -52,4 +59,4 @@ There is no build or test step — it loads directly as an unpacked extension.
 
 ## Usage
 
-Click the extension icon in the toolbar to configure preferences for each site: set your YouTube playback speed, toggle and edit the Focus Mode block list, and enable/disable the Windy.com tweaks.
+Click the extension icon in the toolbar to configure preferences for each site: set your YouTube playback speed, toggle and edit the Focus Mode block list, enable/disable the Windy.com tweaks, and pick the Google Flights currency.

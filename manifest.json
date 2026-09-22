@@ -1,12 +1,31 @@
 {
   "manifest_version": 3,
   "name": "Cedric's Browser Tweaks",
-  "version": "2.2.2",
-  "description": "Personalized browser enhancements: YouTube speed memory, Windy.com aviation weather preferences, Focus Mode site blocker.",
-  "permissions": ["storage", "declarativeNetRequest", "alarms"],
+  "version": "2.3.0",
+  "description": "Personalized browser enhancements: YouTube speed memory, Windy.com aviation weather preferences, Google Flights currency, Focus Mode site blocker.",
+  "permissions": [
+    "storage",
+    "declarativeNetRequest",
+    "alarms"
+  ],
   "host_permissions": [
     "*://*.youtube.com/*",
-    "*://*.windy.com/*"
+    "*://*.windy.com/*",
+    "*://www.google.com/travel/flights*",
+    "*://www.google.ch/travel/flights*",
+    "*://www.google.is/travel/flights*",
+    "*://www.google.de/travel/flights*",
+    "*://www.google.co.uk/travel/flights*",
+    "*://www.google.co.za/travel/flights*",
+    "*://www.google.fr/travel/flights*",
+    "*://www.google.it/travel/flights*",
+    "*://www.google.es/travel/flights*",
+    "*://www.google.at/travel/flights*",
+    "*://www.google.nl/travel/flights*",
+    "*://www.google.com.au/travel/flights*",
+    "*://www.google.ca/travel/flights*",
+    "*://www.google.ae/travel/flights*",
+    "*://www.google.co.id/travel/flights*"
   ],
   "background": {
     "service_worker": "background.js",
@@ -14,14 +33,45 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://*.youtube.com/*"],
-      "js": ["content-youtube.js"],
+      "matches": [
+        "*://*.youtube.com/*"
+      ],
+      "js": [
+        "content-youtube.js"
+      ],
       "run_at": "document_idle"
     },
     {
-      "matches": ["*://*.windy.com/*"],
-      "js": ["content-windy.js"],
+      "matches": [
+        "*://*.windy.com/*"
+      ],
+      "js": [
+        "content-windy.js"
+      ],
       "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "*://www.google.com/travel/flights*",
+        "*://www.google.ch/travel/flights*",
+        "*://www.google.is/travel/flights*",
+        "*://www.google.de/travel/flights*",
+        "*://www.google.co.uk/travel/flights*",
+        "*://www.google.co.za/travel/flights*",
+        "*://www.google.fr/travel/flights*",
+        "*://www.google.it/travel/flights*",
+        "*://www.google.es/travel/flights*",
+        "*://www.google.at/travel/flights*",
+        "*://www.google.nl/travel/flights*",
+        "*://www.google.com.au/travel/flights*",
+        "*://www.google.ca/travel/flights*",
+        "*://www.google.ae/travel/flights*",
+        "*://www.google.co.id/travel/flights*"
+      ],
+      "js": [
+        "content-flights.js"
+      ],
+      "run_at": "document_start"
     }
   ],
   "action": {
