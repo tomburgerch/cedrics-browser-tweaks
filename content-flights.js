@@ -39,6 +39,19 @@
     }
   }
 
+  // Loop guard: never rewrite to the SAME url twice within 30 s. A page that
+  // strips `curr` would send us to one url over and over; distinct
+  // navigations always have distinct urls, so they are never blocked.
+  const GUARD = "flights_tweaks_last_redirect";
+  function redirectTo(url) {
+    let last = {};
+    try { last = JSON.parse(sessionStorage.getItem(GUARD) || "{}"); } catch {}
+    if (last.url === url && Date.now() - last.at < 30000) return false;
+    sessionStorage.setItem(GUARD, JSON.stringify({ url, at: Date.now() }));
+    window.location.replace(url);
+    return true;
+  }
+
   chrome.storage.sync.get(["flights_enabled", "flights_currency"], (settings) => {
     if (settings.flights_enabled === false) return;
     let preferred = CURRENCY_RE.test(settings.flights_currency || "")
@@ -52,20 +65,19 @@
         preferred = onLoad;
         chrome.storage.sync.set({ flights_currency: onLoad });
       } else {
-        window.location.replace(urlWithCurr(preferred));
-        return;
+        if (redirectTo(urlWithCurr(preferred))) return;
       }
     }
 
     // Watch for SPA URL changes (the isolated world cannot hook the page's
     // history API, so poll like the Windy script does).
-    let lastSeen = preferred;
+    let lastSeen = currentCurr() || preferred;
     setInterval(() => {
       const c = currentCurr();
       if (c === null) {
         // An in-app navigation dropped the param, so the page is back on the
         // local currency: reload with the preference (rare; searches keep it).
-        window.location.replace(urlWithCurr(preferred));
+        redirectTo(urlWithCurr(preferred));
         return;
       }
       if (c !== lastSeen) {

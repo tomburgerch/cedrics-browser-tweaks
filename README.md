@@ -43,7 +43,7 @@ A Chrome extension (Manifest V3) with personalized enhancements for frequently u
 - `content-youtube.js` — applies preferred playback speed on YouTube.
 - `content-windy.js` — applies Windy.com location / meteogram / 1h-forecast preferences.
 - `content-flights.js` — keeps Google Flights on your preferred currency.
-- `popup.html` / `popup.js` — toolbar popup UI for configuring all three features.
+- `popup.html` / `popup.js` — toolbar popup UI for configuring all four features.
 - `icons/` — extension icons (16/48/128, plus source `icon.svg`).
 - `docs/superpowers/` — design specs (`specs/`) and implementation plans (`plans/`), e.g. the Windy preferences design.
 
@@ -59,4 +59,4 @@ There is no build or test step — it loads directly as an unpacked extension.
 
 ## Usage
 
-Click the extension icon in the toolbar to configure preferences for each site: set your YouTube playback speed, toggle and edit the Focus Mode block list, and enable/disable the Windy.com tweaks.
+Click the extension icon in the toolbar to configure preferences for each site: set your YouTube playback speed, toggle and edit the Focus Mode block list, enable/disable the Windy.com tweaks, and pick the Google Flights currency.
