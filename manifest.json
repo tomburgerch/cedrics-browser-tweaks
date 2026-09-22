@@ -1,12 +1,31 @@
 {
   "manifest_version": 3,
   "name": "Cedric's Browser Tweaks",
-  "version": "2.2.2",
-  "description": "Personalized browser enhancements: YouTube speed memory, Windy.com aviation weather preferences, Focus Mode site blocker.",
-  "permissions": ["storage", "declarativeNetRequest", "alarms"],
+  "version": "2.3.0",
+  "description": "Personalized browser enhancements: YouTube speed memory, Windy.com aviation weather preferences, Google Flights currency, Focus Mode site blocker.",
+  "permissions": [
+    "storage",
+    "declarativeNetRequest",
+    "alarms"
+  ],
   "host_permissions": [
     "*://*.youtube.com/*",
-    "*://*.windy.com/*"
+    "*://*.windy.com/*",
+    "*://www.google.com/travel/*",
+    "*://www.google.ch/travel/*",
+    "*://www.google.is/travel/*",
+    "*://www.google.de/travel/*",
+    "*://www.google.co.uk/travel/*",
+    "*://www.google.co.za/travel/*",
+    "*://www.google.fr/travel/*",
+    "*://www.google.it/travel/*",
+    "*://www.google.es/travel/*",
+    "*://www.google.at/travel/*",
+    "*://www.google.nl/travel/*",
+    "*://www.google.com.au/travel/*",
+    "*://www.google.ca/travel/*",
+    "*://www.google.ae/travel/*",
+    "*://www.google.co.id/travel/*"
   ],
   "background": {
     "service_worker": "background.js",
@@ -14,14 +33,45 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://*.youtube.com/*"],
-      "js": ["content-youtube.js"],
+      "matches": [
+        "*://*.youtube.com/*"
+      ],
+      "js": [
+        "content-youtube.js"
+      ],
       "run_at": "document_idle"
     },
     {
-      "matches": ["*://*.windy.com/*"],
-      "js": ["content-windy.js"],
+      "matches": [
+        "*://*.windy.com/*"
+      ],
+      "js": [
+        "content-windy.js"
+      ],
       "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "*://www.google.com/travel/*",
+        "*://www.google.ch/travel/*",
+        "*://www.google.is/travel/*",
+        "*://www.google.de/travel/*",
+        "*://www.google.co.uk/travel/*",
+        "*://www.google.co.za/travel/*",
+        "*://www.google.fr/travel/*",
+        "*://www.google.it/travel/*",
+        "*://www.google.es/travel/*",
+        "*://www.google.at/travel/*",
+        "*://www.google.nl/travel/*",
+        "*://www.google.com.au/travel/*",
+        "*://www.google.ca/travel/*",
+        "*://www.google.ae/travel/*",
+        "*://www.google.co.id/travel/*"
+      ],
+      "js": [
+        "content-flights.js"
+      ],
+      "run_at": "document_start"
     }
   ],
   "action": {

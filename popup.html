@@ -233,6 +233,15 @@
       background: #cc0000;
       color: #fff;
     }
+    .currency-select {
+      padding: 4px 6px;
+      border: 1px solid #444;
+      border-radius: 6px;
+      background: #2a2a2a;
+      color: #e8e8e8;
+      font-size: 12px;
+      font-family: inherit;
+    }
   </style>
 </head>
 <body>
@@ -299,6 +308,24 @@
         <span class="toggle-slider"></span>
       </label>
     </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Google Flights</div>
+    <div class="toggle-row">
+      <span class="toggle-label">Fixed currency</span>
+      <label class="toggle">
+        <input type="checkbox" id="flights-enabled" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div class="toggle-row">
+      <span class="toggle-label">Currency</span>
+      <select id="flights-currency" class="currency-select">
+        <option>USD</option><option>EUR</option><option>CHF</option><option>GBP</option><option>ZAR</option><option>ISK</option><option>AED</option><option>IDR</option>
+      </select>
+    </div>
+    <div class="status">Picking a currency in Flights also updates this.</div>
   </div>
 
   <script type="module" src="popup.js"></script>
