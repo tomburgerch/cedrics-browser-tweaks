@@ -88,41 +88,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
   }
 });
 
-// --- Self-update (unpacked installs) ---
-// After `git pull` the files on disk change but Chrome keeps running the old
-// copy. Every 30 minutes (and on startup) compare the manifest on disk with
-// the running one and reload when they differ. Skipped for Web Store installs
-// (which have an update_url and update themselves). No loop: after reload the
-// versions match.
-const SELF_UPDATE_ALARM = "selfUpdateCheck";
-
-async function checkForSelfUpdate() {
-  try {
-    const running = chrome.runtime.getManifest();
-    if ("update_url" in running) return;
-    const res = await fetch(chrome.runtime.getURL("manifest.json"), { cache: "no-store" });
-    const disk = await res.json();
-    if (disk && typeof disk.version === "string" && disk.version !== running.version) {
-      chrome.runtime.reload();
-    }
-  } catch (e) {
-    // Ignore: try again at the next alarm.
-  }
-}
-
-// Create only if missing: re-creating resets the timer on every worker wake.
-(async () => {
-  if (!(await chrome.alarms.get(SELF_UPDATE_ALARM))) {
-    chrome.alarms.create(SELF_UPDATE_ALARM, { periodInMinutes: 30 });
-  }
-})();
-checkForSelfUpdate();
-
 chrome.alarms.onAlarm.addListener(async (alarm) => {
-  if (alarm.name === SELF_UPDATE_ALARM) {
-    await checkForSelfUpdate();
-    return;
-  }
   if (alarm.name !== UNLOCK_ALARM) return;
   await chrome.storage.sync.set({ focusModeEnabled: false, focusUnlockAt: null });
 });

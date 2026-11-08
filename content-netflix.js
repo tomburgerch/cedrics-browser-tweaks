@@ -62,6 +62,10 @@
     if (!onWatchPage()) return;
     const state = states.get(video);
     state.key = sourceKey(video);
+    // This playback belongs to the current path. Without this, a src swap
+    // (no DOM mutation) leaves lastPath stale and the next unrelated mutation
+    // would restart the source and override a manual choice.
+    lastPath = location.pathname;
     state.graceUntil = Date.now() + GRACE_MS;
     state.reapplied = 0;
     state.userChose = false;

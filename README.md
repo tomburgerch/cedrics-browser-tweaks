@@ -21,7 +21,8 @@ A Chrome extension (Manifest V3) with personalized enhancements for frequently u
 - Plays every Netflix title at your chosen speed (default: 1.5x). Choices in the popup: 1x, 1.5x, 1.75x, 2x (`netflixSpeed`, synced).
 - Sets `video.playbackRate` directly, so it goes past the 1.5x cap of Netflix's own Playback Speed menu.
 - Re-applies on each new episode or title (Netflix is a SPA, so the content script watches for new `<video>` elements and `/watch/<id>` URL changes).
-- Netflix often resets the rate to 1 while the player starts up; those resets in the first 3 seconds of a playback are corrected. After that, a manual change in Netflix's menu wins until the next episode. 1x turns the tweak off.
+- Never fights a manual change. A rate change the extension did not make is read as yours only when a click or keypress came within the last 1.5 s (Netflix's speed menu needs a click); then that episode is left alone until the next one starts. Rate changes without a gesture, and any in the first 3 s of a playback (the player resets to 1x while it starts up), are Netflix's own and get corrected, at most 20 times per episode. 1x turns the tweak off.
+- `/browse` preview videos are left alone; only `/watch` pages are touched.
 
 ### Windy.com — Aviation Weather Preferences
 - Auto-redirects to your last viewed location (default: King Shaka / Durban FALE, `-29.602 / 31.130`).
@@ -39,7 +40,7 @@ A Chrome extension (Manifest V3) with personalized enhancements for frequently u
 ## Tech Stack
 
 - Plain JavaScript Chrome extension, **Manifest V3** — no build step, no dependencies.
-- APIs: `declarativeNetRequest` (Focus Mode blocking), `chrome.storage.sync` (cross-device preferences), `chrome.alarms` (unlock cooldown, plus the 30-minute self-update check).
+- APIs: `declarativeNetRequest` (Focus Mode blocking), `chrome.storage.sync` (cross-device preferences), `chrome.alarms` (unlock cooldown).
 - Permissions: `storage`, `declarativeNetRequest`, `alarms`. Host permissions: `*://*.youtube.com/*`, `*://*.netflix.com/*`, `*://*.windy.com/*`.
 
 ## Project Structure
@@ -47,7 +48,7 @@ A Chrome extension (Manifest V3) with personalized enhancements for frequently u
 - `manifest.json` — extension manifest (permissions, content-script matches, background service worker).
 - `background.js` — Focus Mode service worker: manages dynamic `declarativeNetRequest` block rules and the unlock-cooldown alarm.
 - `content-youtube.js` — applies preferred playback speed on YouTube.
-- `content-netflix.js` — applies preferred playback speed on Netflix (with a startup grace window).
+- `content-netflix.js` — applies preferred playback speed on Netflix (startup grace window, user-gesture rule for manual changes).
 - `content-windy.js` — applies Windy.com location / meteogram / 1h-forecast preferences.
 - `content-flights.js` — keeps Google Flights on your preferred currency.
 - `popup.html` / `popup.js` — toolbar popup UI for configuring all five features.
@@ -64,7 +65,7 @@ A Chrome extension (Manifest V3) with personalized enhancements for frequently u
 
 There is no build or test step — it loads directly as an unpacked extension.
 
-After `git pull`, the extension reloads itself within 30 minutes (a `chrome.alarms` check compares the `manifest.json` version on disk with the running one), or immediately on browser restart; a manual reload in `chrome://extensions` is instant.
+To update: `git pull`, then click the reload icon on the extension's card in `chrome://extensions` (or restart Chrome). Unpacked extensions do not pick up new files on their own.
 
 ## Usage
 
