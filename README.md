@@ -21,7 +21,8 @@ A Chrome extension (Manifest V3) with personalized enhancements for frequently u
 - Plays every Netflix title at your chosen speed (default: 1.5x). Choices in the popup: 1x, 1.5x, 1.75x, 2x (`netflixSpeed`, synced).
 - Sets `video.playbackRate` directly, so it goes past the 1.5x cap of Netflix's own Playback Speed menu.
 - Re-applies on each new episode or title (Netflix is a SPA, so the content script watches for new `<video>` elements and `/watch/<id>` URL changes).
-- Never fights a manual change. A rate change the extension did not make is read as yours only when a click or keypress came within the last 1.5 s (Netflix's speed menu needs a click); then that episode is left alone until the next one starts. Rate changes without a gesture, and any in the first 3 s of a playback (the player resets to 1x while it starts up), are Netflix's own and get corrected, at most 20 times per episode. 1x turns the tweak off.
+- Never fights a manual change. A rate change the extension did not make counts as yours only when a click or keypress came within the last 1.5 s AND either the new rate is not 1x or the click was inside Netflix's speed menu; your choice then stays for that episode, and Netflix resets restore it. A change to exactly 1x after a click elsewhere (Skip Intro, scrub bar, space, arrows) is a Netflix reset. Changes in the first 3 s of a playback (the player resets to 1x while it starts) are Netflix's too. Netflix resets restore your speed or your manual choice, at most 5 times per 10 s. 1x turns the tweak off.
+- After reloading the extension, an already-open Netflix tab keeps the old script until you reload that tab.
 - `/browse` preview videos are left alone; only `/watch` pages are touched.
 
 ### Windy.com — Aviation Weather Preferences
