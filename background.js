@@ -110,7 +110,12 @@ async function checkForSelfUpdate() {
   }
 }
 
-chrome.alarms.create(SELF_UPDATE_ALARM, { periodInMinutes: 30 });
+// Create only if missing: re-creating resets the timer on every worker wake.
+(async () => {
+  if (!(await chrome.alarms.get(SELF_UPDATE_ALARM))) {
+    chrome.alarms.create(SELF_UPDATE_ALARM, { periodInMinutes: 30 });
+  }
+})();
 checkForSelfUpdate();
 
 chrome.alarms.onAlarm.addListener(async (alarm) => {
