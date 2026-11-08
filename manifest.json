@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Cedric's Browser Tweaks",
-  "version": "2.3.0",
-  "description": "Personalized browser enhancements: YouTube speed memory, Windy.com aviation weather preferences, Google Flights currency, Focus Mode site blocker.",
+  "version": "2.4.0",
+  "description": "Personalized browser enhancements: YouTube and Netflix speed memory, Windy.com aviation weather preferences, Google Flights currency, Focus Mode site blocker.",
   "permissions": [
     "storage",
     "declarativeNetRequest",
@@ -10,6 +10,7 @@
   ],
   "host_permissions": [
     "*://*.youtube.com/*",
+    "*://*.netflix.com/*",
     "*://*.windy.com/*",
     "*://www.google.com/travel/flights*",
     "*://www.google.ch/travel/flights*",
@@ -38,6 +39,15 @@
       ],
       "js": [
         "content-youtube.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "*://*.netflix.com/*"
+      ],
+      "js": [
+        "content-netflix.js"
       ],
       "run_at": "document_idle"
     },

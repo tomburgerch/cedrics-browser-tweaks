@@ -187,7 +187,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
 
 // --- YouTube Section ---
 const DEFAULT_SPEED = 2.0;
-const buttons = document.querySelectorAll(".speed-btn");
+const buttons = document.querySelectorAll("#yt-speed-grid .speed-btn");
 const ytStatus = document.getElementById("yt-status");
 
 chrome.storage.sync.get("preferredSpeed", (result) => {
@@ -211,6 +211,29 @@ function highlightActive(speed) {
     btn.classList.toggle("active", parseFloat(btn.dataset.speed) === speed);
   });
 }
+
+// --- Netflix Section ---
+const NF_DEFAULT_SPEED = 1.5;
+const nfButtons = document.querySelectorAll("#nf-speed-grid .speed-btn");
+const nfStatus = document.getElementById("nf-status");
+
+function nfShow(speed) {
+  nfButtons.forEach((btn) => {
+    btn.classList.toggle("active", parseFloat(btn.dataset.nfSpeed) === speed);
+  });
+  nfStatus.textContent = `Speed: ${speed}x (saved)`;
+}
+
+chrome.storage.sync.get("netflixSpeed", (result) => {
+  nfShow(result.netflixSpeed || NF_DEFAULT_SPEED);
+});
+
+nfButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const speed = parseFloat(btn.dataset.nfSpeed);
+    chrome.storage.sync.set({ netflixSpeed: speed }, () => nfShow(speed));
+  });
+});
 
 // --- Windy Section ---
 const windyToggles = {

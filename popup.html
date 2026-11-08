@@ -40,6 +40,9 @@
       gap: 6px;
       margin-bottom: 12px;
     }
+    .speed-grid.four {
+      grid-template-columns: repeat(4, 1fr);
+    }
     .speed-btn {
       padding: 8px 0;
       border: 1px solid #444;
@@ -274,7 +277,7 @@
   <div class="section">
     <div class="section-label">YouTube</div>
     <h2>Playback Speed</h2>
-    <div class="speed-grid">
+    <div class="speed-grid" id="yt-speed-grid">
       <button class="speed-btn" data-speed="1">1x</button>
       <button class="speed-btn" data-speed="1.25">1.25x</button>
       <button class="speed-btn" data-speed="1.5">1.5x</button>
@@ -283,6 +286,18 @@
       <button class="speed-btn" data-speed="2.5">2.5x</button>
     </div>
     <div class="status" id="yt-status">Loading...</div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Netflix</div>
+    <h2>Playback Speed</h2>
+    <div class="speed-grid four" id="nf-speed-grid">
+      <button class="speed-btn" data-nf-speed="1">1x</button>
+      <button class="speed-btn" data-nf-speed="1.5">1.5x</button>
+      <button class="speed-btn" data-nf-speed="1.75">1.75x</button>
+      <button class="speed-btn" data-nf-speed="2">2x</button>
+    </div>
+    <div class="status" id="nf-status">Loading...</div>
   </div>
 
   <div class="section">
