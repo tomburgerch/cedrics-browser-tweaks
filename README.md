@@ -1,6 +1,6 @@
 # Cedric's Browser Tweaks
 
-A Chrome extension (Manifest V3) with personalized enhancements for frequently used websites: a Focus Mode site blocker, YouTube playback-speed memory, Windy.com aviation weather preferences, and a fixed Google Flights currency.
+A Chrome extension (Manifest V3) with personalized enhancements for frequently used websites: a Focus Mode site blocker, YouTube and Netflix playback-speed memory, Windy.com aviation weather preferences, and a fixed Google Flights currency.
 
 ## Features
 
@@ -16,6 +16,12 @@ A Chrome extension (Manifest V3) with personalized enhancements for frequently u
 - Persists across page navigations, new tabs, and browser restarts (SPA-aware via a `MutationObserver`).
 - Syncs your preference across devices via Chrome sync (`preferredSpeed`).
 - Speeds: 1x, 1.25x, 1.5x, 1.75x, 2x, 2.5x (default: 2x).
+
+### Netflix: Speed Saver
+- Plays every Netflix title at your chosen speed (default: 1.5x). Choices in the popup: 1x, 1.5x, 1.75x, 2x (`netflixSpeed`, synced).
+- Sets `video.playbackRate` directly, so it goes past the 1.5x cap of Netflix's own Playback Speed menu.
+- Re-applies on each new episode or title (Netflix is a SPA, so the content script watches for new `<video>` elements and `/watch/<id>` URL changes).
+- Netflix often resets the rate to 1 while the player starts up; those resets in the first 3 seconds of a playback are corrected. After that, a manual change in Netflix's menu wins until the next episode. 1x turns the tweak off.
 
 ### Windy.com — Aviation Weather Preferences
 - Auto-redirects to your last viewed location (default: King Shaka / Durban FALE, `-29.602 / 31.130`).
@@ -33,17 +39,18 @@ A Chrome extension (Manifest V3) with personalized enhancements for frequently u
 ## Tech Stack
 
 - Plain JavaScript Chrome extension, **Manifest V3** — no build step, no dependencies.
-- APIs: `declarativeNetRequest` (Focus Mode blocking), `chrome.storage.sync` (cross-device preferences), `chrome.alarms` (unlock cooldown).
-- Permissions: `storage`, `declarativeNetRequest`, `alarms`. Host permissions: `*://*.youtube.com/*`, `*://*.windy.com/*`.
+- APIs: `declarativeNetRequest` (Focus Mode blocking), `chrome.storage.sync` (cross-device preferences), `chrome.alarms` (unlock cooldown, plus the 30-minute self-update check).
+- Permissions: `storage`, `declarativeNetRequest`, `alarms`. Host permissions: `*://*.youtube.com/*`, `*://*.netflix.com/*`, `*://*.windy.com/*`.
 
 ## Project Structure
 
 - `manifest.json` — extension manifest (permissions, content-script matches, background service worker).
 - `background.js` — Focus Mode service worker: manages dynamic `declarativeNetRequest` block rules and the unlock-cooldown alarm.
 - `content-youtube.js` — applies preferred playback speed on YouTube.
+- `content-netflix.js` — applies preferred playback speed on Netflix (with a startup grace window).
 - `content-windy.js` — applies Windy.com location / meteogram / 1h-forecast preferences.
 - `content-flights.js` — keeps Google Flights on your preferred currency.
-- `popup.html` / `popup.js` — toolbar popup UI for configuring all four features.
+- `popup.html` / `popup.js` — toolbar popup UI for configuring all five features.
 - `icons/` — extension icons (16/48/128, plus source `icon.svg`).
 - `docs/superpowers/` — design specs (`specs/`) and implementation plans (`plans/`), e.g. the Windy preferences design.
 
@@ -53,10 +60,12 @@ A Chrome extension (Manifest V3) with personalized enhancements for frequently u
 2. Open `chrome://extensions/` in Chrome.
 3. Enable **Developer mode** (top right).
 4. Click **Load unpacked** and select the project folder.
-5. The extension is now active on YouTube and Windy.com.
+5. The extension is now active on YouTube, Netflix, Windy.com and Google Flights.
 
 There is no build or test step — it loads directly as an unpacked extension.
 
+After `git pull`, the extension reloads itself within 30 minutes (a `chrome.alarms` check compares the `manifest.json` version on disk with the running one), or immediately on browser restart; a manual reload in `chrome://extensions` is instant.
+
 ## Usage
 
-Click the extension icon in the toolbar to configure preferences for each site: set your YouTube playback speed, toggle and edit the Focus Mode block list, enable/disable the Windy.com tweaks, and pick the Google Flights currency.
+Click the extension icon in the toolbar to configure preferences for each site: set your YouTube and Netflix playback speeds, toggle and edit the Focus Mode block list, enable/disable the Windy.com tweaks, and pick the Google Flights currency.
